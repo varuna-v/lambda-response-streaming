@@ -28,6 +28,9 @@ export class LambdaResponseStreamingExampleStack extends cdk.Stack {
         entry: "src/without-stream.ts",
         handler: "handler",
         runtime: aws_lambda.Runtime.NODEJS_20_X,
+        timeout: cdk.Duration.seconds(15),
+        memorySize: 512,
+        ephemeralStorageSize: cdk.Size.mebibytes(512),
         environment: { BUCKET_NAME: bucket.bucketName },
       }
     );
@@ -41,5 +44,9 @@ export class LambdaResponseStreamingExampleStack extends cdk.Stack {
       "GET",
       new apigw.LambdaIntegration(functionWithoutStream)
     );
+
+    new cdk.CfnOutput(this, "ApiUrl", {
+      value: api.url,
+    });
   }
 }
