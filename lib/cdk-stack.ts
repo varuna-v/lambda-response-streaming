@@ -1,16 +1,28 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import { aws_lambda_nodejs } from "aws-cdk-lib";
+import { StringParameter } from "aws-cdk-lib/aws-ssm";
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
+    cdk.Tags.of(this).add("project", "lambda-response-streaming");
 
-    // example resource
-    // const queue = new sqs.Queue(this, 'CdkQueue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
+    const bucketName = StringParameter.fromStringParameterName(
+      this,
+      "LambdaResponseStreamingSampleFilesBucketName",
+      "/lambda-response-streaming/sample-files-bucket"
+    );
+
+    const functionWithoutStream = new aws_lambda_nodejs.NodejsFunction(
+      this,
+      "functionWithoutStream",
+      {
+        entry: "../src/index.ts",
+        handler: "handler",
+        environment: { BUCKET_NAME: bucketName.stringValue },
+      }
+    );
   }
 }
