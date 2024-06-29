@@ -1,19 +1,25 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { aws_lambda, aws_lambda_nodejs } from "aws-cdk-lib";
-import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import * as apigw from "aws-cdk-lib/aws-apigateway";
+import { Bucket, BlockPublicAccess } from "aws-cdk-lib/aws-s3";
+import { BucketDeployment, Source } from "aws-cdk-lib/aws-s3-deployment";
 
 export class LambdaResponseStreamingExampleStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
     cdk.Tags.of(this).add("project", "lambda-response-streaming");
 
-    const bucketName = StringParameter.fromStringParameterName(
-      this,
-      "LambdaResponseStreamingSampleFilesBucketName",
-      "/lambda-response-streaming/sample-files-bucket"
-    );
+    const bucket = new Bucket(this, "lambdaresponsestreamsamplefiles", {
+      versioned: true,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+    });
+
+    new BucketDeployment(this, "SampleFiles", {
+      sources: [Source.asset("sample_files")],
+      destinationBucket: bucket,
+    });
 
     const functionWithoutStream = new aws_lambda_nodejs.NodejsFunction(
       this,
@@ -22,9 +28,10 @@ export class LambdaResponseStreamingExampleStack extends cdk.Stack {
         entry: "src/without-stream.ts",
         handler: "handler",
         runtime: aws_lambda.Runtime.NODEJS_20_X,
-        environment: { BUCKET_NAME: bucketName.stringValue },
+        environment: { BUCKET_NAME: bucket.bucketName },
       }
     );
+    bucket.grantRead(functionWithoutStream);
 
     const api = new apigw.RestApi(this, "LambdaResponseStreamingExampleApi", {
       description: "Lambda Response Streaming Example API",
