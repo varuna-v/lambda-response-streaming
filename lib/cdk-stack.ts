@@ -1,6 +1,6 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
-import { aws_lambda_nodejs } from "aws-cdk-lib";
+import { aws_lambda, aws_lambda_nodejs } from "aws-cdk-lib";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
 
 export class CdkStack extends cdk.Stack {
@@ -19,8 +19,9 @@ export class CdkStack extends cdk.Stack {
       this,
       "functionWithoutStream",
       {
-        entry: "../src/index.ts",
+        entry: "../src/without-stream.ts",
         handler: "handler",
+        runtime: aws_lambda.Runtime.NODEJS_20_X,
         environment: { BUCKET_NAME: bucketName.stringValue },
       }
     );
