@@ -4,7 +4,7 @@ Example of how Lambda response streaming can be used with API Gateway to return 
 
 ## Deploying
 
-cdk deploy --profile=<profile-name>
+cdk deploy --profile=\<profile-name\>
 
 ## Ongoing notes from AWS docs
 
