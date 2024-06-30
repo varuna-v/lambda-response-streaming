@@ -50,11 +50,11 @@ export class LambdaResponseStreamingExampleStack extends cdk.Stack {
       new apigw.LambdaIntegration(functionBufferResponse)
     );
 
-    const functionWithStream = new aws_lambda_nodejs.NodejsFunction(
+    const functionStreamResponse = new aws_lambda_nodejs.NodejsFunction(
       this,
-      "functionWithStream",
+      "functionStreamResponse",
       {
-        entry: "src/with-stream.ts",
+        entry: "src/stream-response.ts",
         handler: "handler",
         runtime: aws_lambda.Runtime.NODEJS_20_X,
         timeout: cdk.Duration.seconds(15),
@@ -63,13 +63,16 @@ export class LambdaResponseStreamingExampleStack extends cdk.Stack {
         environment: { BUCKET_NAME: bucket.bucketName },
       }
     );
-    bucket.grantRead(functionWithStream);
+    bucket.grantRead(functionStreamResponse);
 
-    const functionUrl = functionWithStream.addFunctionUrl({
+    const functionUrl = functionStreamResponse.addFunctionUrl({
       authType: FunctionUrlAuthType.NONE,
       invokeMode: aws_lambda.InvokeMode.RESPONSE_STREAM,
     });
-    const withStreamPath = api.root.addResource("with-stream");
-    withStreamPath.addMethod("GET", new apigw.HttpIntegration(functionUrl.url));
+    const StreamResponsePath = api.root.addResource("stream-response");
+    StreamResponsePath.addMethod(
+      "GET",
+      new apigw.HttpIntegration(functionUrl.url)
+    );
   }
 }
