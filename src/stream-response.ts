@@ -1,7 +1,7 @@
 import { S3 } from "aws-sdk";
 import { APIGatewayProxyEventV2 } from "aws-lambda";
 
-import { ResponseStream } from "./response-stream";
+import { ResponseStream } from "./utils/ResponseStream";
 
 // @ts-ignore - awslambda is a global
 export const handler = awslambda.streamifyResponse(requestHandler);
