@@ -30,11 +30,11 @@ export class LambdaResponseStreamingExampleStack extends cdk.Stack {
       value: api.url,
     });
 
-    const functionWithoutStream = new aws_lambda_nodejs.NodejsFunction(
+    const functionBufferResponse = new aws_lambda_nodejs.NodejsFunction(
       this,
-      "functionWithoutStream",
+      "functionBufferResponse",
       {
-        entry: "src/without-stream.ts",
+        entry: "src/buffer-response.ts",
         handler: "handler",
         runtime: aws_lambda.Runtime.NODEJS_20_X,
         timeout: cdk.Duration.seconds(15),
@@ -43,11 +43,11 @@ export class LambdaResponseStreamingExampleStack extends cdk.Stack {
         environment: { BUCKET_NAME: bucket.bucketName },
       }
     );
-    bucket.grantRead(functionWithoutStream);
-    const withoutStreamPath = api.root.addResource("without-stream");
-    withoutStreamPath.addMethod(
+    bucket.grantRead(functionBufferResponse);
+    const bufferResponsePath = api.root.addResource("buffer-response");
+    bufferResponsePath.addMethod(
       "GET",
-      new apigw.LambdaIntegration(functionWithoutStream)
+      new apigw.LambdaIntegration(functionBufferResponse)
     );
 
     const functionWithStream = new aws_lambda_nodejs.NodejsFunction(
