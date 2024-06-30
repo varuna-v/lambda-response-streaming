@@ -1,14 +1,15 @@
-# Welcome to your CDK TypeScript project
+# Lambda Response Streaming with API Gateway
 
-This is a blank project for CDK development with TypeScript.
+Example of how Lambda response streaming can be used with API Gateway to return larger data sets.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+## Deploying
 
-## Useful commands
+cdk deploy --profile=<profile-name>
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `npx cdk deploy`  deploy this stack to your default AWS account/region
-* `npx cdk diff`    compare deployed stack with current state
-* `npx cdk synth`   emits the synthesized CloudFormation template
+## Ongoing notes from AWS docs
+
+- Lambda response size limit is 6mb, which is fine but also not suitable for the biggest queries.
+- API Gateway has a response payload limit of 10 MB
+- Response stream 20 MB
+- The first 6MB of your function’s response payload has uncapped bandwidth. After this initial burst, Lambda streams your response at a maximum rate of 2MBps. If your function responses never exceed 6MB, then this bandwidth limit never applies.
+- Processed Bytes $0.008000 per GB
