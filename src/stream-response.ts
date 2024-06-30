@@ -1,10 +1,13 @@
 import { S3 } from "aws-sdk";
 import { APIGatewayProxyEventV2 } from "aws-lambda";
-
-import { ResponseStream } from "./utils/ResponseStream";
+import { Writable } from "stream";
 
 // @ts-ignore - awslambda is a global
 export const handler = awslambda.streamifyResponse(requestHandler);
+
+export type ResponseStream = Writable & {
+  setContentType(type: string): void;
+};
 
 async function requestHandler(
   event: APIGatewayProxyEventV2,
@@ -16,13 +19,23 @@ async function requestHandler(
 
   fileName = fileName + ".txt";
 
-  const data = await s3
+  const dataStream = await s3
     .getObject({ Bucket: bucketName, Key: fileName })
-    .promise();
-  const fileContents = data.Body?.toString("utf-8") || "";
+    .createReadStream();
 
-  const result = fileName + " " + fileContents;
   responseStream.setContentType("text/plain");
-  responseStream.write(result);
-  responseStream.end();
+  responseStream.write("file read: " + fileName + "\n");
+
+  dataStream.on("data", (chunk) => {
+    responseStream.write(chunk.toString("utf-8"));
+  });
+
+  dataStream.on("end", () => {
+    responseStream.end();
+  });
+
+  dataStream.on("error", (err) => {
+    responseStream.write("Error reading file");
+    responseStream.end();
+  });
 }
