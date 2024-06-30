@@ -5,7 +5,6 @@ import * as apigw from "aws-cdk-lib/aws-apigateway";
 import { Bucket, BlockPublicAccess } from "aws-cdk-lib/aws-s3";
 import { BucketDeployment, Source } from "aws-cdk-lib/aws-s3-deployment";
 import { FunctionUrlAuthType } from "aws-cdk-lib/aws-lambda";
-import * as iam from "aws-cdk-lib/aws-iam";
 export class LambdaResponseStreamingExampleStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
