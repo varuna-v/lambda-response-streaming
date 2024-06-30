@@ -68,8 +68,8 @@ export class LambdaResponseStreamingExampleStack extends cdk.Stack {
       authType: FunctionUrlAuthType.NONE,
       invokeMode: aws_lambda.InvokeMode.RESPONSE_STREAM,
     });
-    const StreamResponsePath = api.root.addResource("stream-response");
-    StreamResponsePath.addMethod(
+    const streamResponsePath = api.root.addResource("stream-response");
+    streamResponsePath.addMethod(
       "GET",
       new apigw.HttpIntegration(functionUrl.url)
     );
